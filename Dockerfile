@@ -6,8 +6,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PG_MAJOR=13
 ENV POSTGIS_VERSION=3
 
-RUN apt-get update && apt-get upgrade -y
-RUN apt-get install --no-install-recommends -y \
+RUN \
+    apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install --no-install-recommends -y \
     postgresql-$PG_MAJOR-postgis-$POSTGIS_VERSION \
     postgresql-$PG_MAJOR-postgis-$POSTGIS_VERSION-scripts; \
     apt-get install -y ca-certificates tmux screen curl less && \
@@ -18,15 +20,15 @@ RUN apt-get install --no-install-recommends -y \
 #RUN localedef -i de_CH -c -f UTF-8 -A /usr/share/locale/locale.alias de_CH.UTF-8
 #ENV LANG de_CH.utf8
 
-RUN pip3 install --upgrade pip
-
 # get qwc-config-db for migrations
 ARG GIT_REPO=https://github.com/qwc-services/qwc-config-db.git
 RUN cd /tmp/ && git clone $GIT_REPO qwc-config-db
 # Set ALEMBIC_VERSION to force git pull
 ARG ALEMBIC_VERSION=head
 RUN cd /tmp/qwc-config-db/ && git pull
-RUN pip3 install --no-cache-dir -r /tmp/qwc-config-db/requirements.txt
+RUN \
+    pip3 install --upgrade pip && \
+    pip3 install --no-cache-dir -r /tmp/qwc-config-db/requirements.txt
 
 # setup connection service for migrations
 COPY pg_service.conf /tmp/.pg_service.conf
