@@ -2,7 +2,7 @@
 [![docker](https://img.shields.io/docker/v/sourcepole/qwc-demo-db?label=qwc-demo-db%20image&sort=semver)](https://hub.docker.com/r/sourcepole/qwc-demo-db)
 
 
-QWC demo DB
-===========
+QWC DB setup
+============
 
-Demo database for QWC docker.
+WIP - currently not meant to be used
