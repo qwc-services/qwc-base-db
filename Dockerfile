@@ -31,14 +31,14 @@ RUN \
     pip3 install --no-cache-dir -r /tmp/qwc-config-db/requirements.txt
 
 # setup connection service for migrations
-COPY pg_service.conf /tmp/.pg_service.conf
+COPY demo-data/pg_service.conf /tmp/.pg_service.conf
 ENV PGSERVICEFILE /tmp/.pg_service.conf
 
 # setup database
 RUN curl -o /tmp/demo_geodata.gpkg -L https://github.com/pka/mvt-benchmark/raw/master/data/mvtbench.gpkg
 COPY setup-db.sh /docker-entrypoint-initdb.d/0_setup-db.sh
 COPY run-migrations.sh /docker-entrypoint-initdb.d/1_run-migrations.sh
-COPY setup-demo-data.sh /docker-entrypoint-initdb.d/2_setup-demo-data.sh
+COPY demo-data/setup-demo-data.sh /docker-entrypoint-initdb.d/2_setup-demo-data.sh
 RUN chmod +x /docker-entrypoint-initdb.d/*.sh
 RUN cp -a /usr/local/bin/docker-entrypoint.sh /tmp/docker-entrypoint.sh
 # we do not want to execute postgres *after* /docker-entrypoint-initdb.d
