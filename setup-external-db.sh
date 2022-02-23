@@ -27,6 +27,8 @@ help() {
    exit 1
 }
 
+echo "this is currently untested! Uncomment this line if you want to proceed" && exit 1
+
 # defaults:
 #
 QWC_CONFIG_DB_GIT_REPO_DEFAULT=https://github.com/qwc-services/qwc-config-db.git
