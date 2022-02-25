@@ -22,7 +22,7 @@ jobs:
       - name: Build and publish docker image
         uses: elgohr/Publish-Docker-Github-Action@2.12
         with:
-          name: sourcepole/qwc-demo-db
+          name: sourcepole/qwc-base-db
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
           tags: "latest,${{ steps.get_tag.outputs.tag }}"
