@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# This is mostly the same as Dockerfile
+#
+#                     PLEASE KEEP IN SYNC
+
 help() {
    echo 'usage: setup-external-db.sh'
    echo '       setup-external-db.sh --help'

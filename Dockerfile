@@ -1,6 +1,6 @@
 # QWC Services base DB
 #
-# This is mostly the same as Dockerfile.demo and setup-external-db.sh
+# This is mostly the same as setup-external-db.sh
 #
 #                     PLEASE KEEP IN SYNC
 #
