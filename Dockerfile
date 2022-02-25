@@ -11,6 +11,12 @@
 #   If migration is needed:
 #   - will set up config-db
 #
+# Please set ALEMBIC_VERSION to a specific commit hash
+# in the docker image runtime environment, if you want
+# to check out and run a different version of
+# qwc-config-db migrations than those from `head`.
+# See the `run-migrations.sh`.
+
 FROM postgres:13
 
 ENV DEBIAN_FRONTEND=noninteractive
