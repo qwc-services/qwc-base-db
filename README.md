@@ -1,3 +1,6 @@
+[![CI](https://github.com/qwc-services/qwc-db-setup/actions/workflows/qwc-base-db.yml/badge.svg)](https://github.com/qwc-services/qwc-db-setup/actions)
+[![docker](https://img.shields.io/docker/v/sourcepole/qwc-base-db?label=qwc-demo-db%20image&sort=semver)](https://hub.docker.com/r/sourcepole/qwc-base-db)
+
 QWC DB setup
 ============
 
