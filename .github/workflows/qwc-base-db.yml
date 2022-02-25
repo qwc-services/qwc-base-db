@@ -1,4 +1,4 @@
-name: Publish qwc-demo-db docker image
+name: Publish qwc-base-db docker image
 
 on: [push]
 
@@ -21,12 +21,9 @@ jobs:
 
       - name: Build and publish docker image
         uses: elgohr/Publish-Docker-Github-Action@2.12
-        env:
-          ALEMBIC_VERSION: 0352a94313d6
         with:
           name: sourcepole/qwc-demo-db
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
           tags: "latest,${{ steps.get_tag.outputs.tag }}"
           workdir: .
-          buildargs: ALEMBIC_VERSION
