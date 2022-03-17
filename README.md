@@ -7,19 +7,9 @@ QWC DB setup
 This repository is concerned with configuring a postgres DB,
 so that it can be used by QWC.
 
-The software herein has two basic targets:
-
-* The qwc-base-db Docker container image, which contains
-  a postgres server, postgis and demo data, that can
-  be used if wanted.
-
-  The https://github.com/qwc-services/qwc-demo-db repository
-  uses this image to create another container image with a
-  ready to use database filled with demo data for easy trying
-  out QWC2.
-
-* providing a script that will set up an external postgres
-  server and add demo data so that it can be used with QWC2.
+The image contains the postgres server, the postgis extension,
+and scripts to set up the `qwc_configdb` configuration database
+and scripts to insert the demo data.
 
 
 
@@ -74,15 +64,3 @@ If `/var/lib/postgresql/data` is *NOT* empty, such as when:
 
 then postgres will just start and try to use the data that is already
 under `/var/lib/postgresql/data`.
-
-
-### The DB setup script
-
-The [setup-external-db.sh](setup-external-db.sh) script should set
-up an *external* Postgres instance, so that it can be used with QWC
-out of the box. It will also create a `qwc_demo` DB and fill it with
-demo data.
-
-TODO
-----
-* re-add badges
