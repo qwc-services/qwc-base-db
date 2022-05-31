@@ -4,6 +4,7 @@ help() {
    echo 'usage: setup-demo-data.sh [--host=HOST]'
    echo '                          [--username=USERNAME]'
    echo '                          [--password=PASSWORD]'
+   echo '                          [--grants-are-setup-externally]'
    echo '                          [--dbname=DBNAME]'
    echo '       setup-demo-data.sh --help'
    echo
@@ -15,6 +16,7 @@ DBNAME=qwc_demo
 USERNAME=qwc_admin
 PASSWORD=qwc_admin
 HOST=
+GRANTS_ARE_SETUP_EXTERNALLY=no
 
 # parse option parameters
 while [ "$1" != "" ]; do
@@ -23,6 +25,7 @@ while [ "$1" != "" ]; do
   [[ "$1" =~ ^--username= ]] && USERNAME=$( echo "$1" | sed 's/--username=//' )
   [[ "$1" =~ ^--password= ]] && PASSWORD=$( echo "$1" | sed 's/--password=//' )
   [[ "$1" =~ ^--host=     ]] && HOST="host=$(     echo "$1" | sed 's/--host=//' )"
+  [[ "$1" =~ ^--grants-are-setup-externally ]] && GRANTS_ARE_SETUP_EXTERNALLY=yes
   shift
 done
 
@@ -120,14 +123,16 @@ psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
         ST_GeomFromText('POLYGON((950819 6003952,950831 6003947,950828 6003925,950822 6003905,950804 6003913,950819 6003952))', 3857));
 EOSQL
 
-psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
-  GRANT SELECT ON ALL TABLES IN SCHEMA qwc_geodb TO qgis_server;
-  GRANT SELECT ON ALL SEQUENCES IN SCHEMA qwc_geodb TO qgis_server;
-  GRANT SELECT ON ALL TABLES IN SCHEMA qwc_geodb TO qwc_service;
-  GRANT SELECT ON ALL SEQUENCES IN SCHEMA qwc_geodb TO qwc_service;
-  GRANT ALL ON ALL TABLES IN SCHEMA qwc_geodb TO qwc_service_write;
-  GRANT USAGE ON ALL SEQUENCES IN SCHEMA qwc_geodb TO qwc_service_write;
+if [ "$GRANTS_ARE_SETUP_EXTERNALLY" == "no" ]; then
+  psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
+    GRANT SELECT ON ALL TABLES IN SCHEMA qwc_geodb TO qgis_server;
+    GRANT SELECT ON ALL SEQUENCES IN SCHEMA qwc_geodb TO qgis_server;
+    GRANT SELECT ON ALL TABLES IN SCHEMA qwc_geodb TO qwc_service;
+    GRANT SELECT ON ALL SEQUENCES IN SCHEMA qwc_geodb TO qwc_service;
+    GRANT ALL ON ALL TABLES IN SCHEMA qwc_geodb TO qwc_service_write;
+    GRANT USAGE ON ALL SEQUENCES IN SCHEMA qwc_geodb TO qwc_service_write;
 EOSQL
+fi
 
 # insert demo records into ConfigDB
 # >>> from werkzeug.security import generate_password_hash
