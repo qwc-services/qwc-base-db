@@ -1,7 +1,10 @@
 #!/bin/bash
 
 help() {
-   echo 'usage: setup-demo-data.sh [--username=USERNAME] [--password=PASSWORD] [--dbname=DBNAME]'
+   echo 'usage: setup-demo-data.sh [--host=HOST]'
+   echo '                          [--username=USERNAME]'
+   echo '                          [--password=PASSWORD]'
+   echo '                          [--dbname=DBNAME]'
    echo '       setup-demo-data.sh --help'
    echo
    exit 1
@@ -11,6 +14,7 @@ help() {
 DBNAME=qwc_demo
 USERNAME=qwc_admin
 PASSWORD=qwc_admin
+HOST=
 
 # parse option parameters
 while [ "$1" != "" ]; do
@@ -18,13 +22,14 @@ while [ "$1" != "" ]; do
   [[ "$1" =~ ^--dbname=   ]] && DBNAME=$(   echo "$1" | sed 's/--dbname=//'   )
   [[ "$1" =~ ^--username= ]] && USERNAME=$( echo "$1" | sed 's/--username=//' )
   [[ "$1" =~ ^--password= ]] && PASSWORD=$( echo "$1" | sed 's/--password=//' )
+  [[ "$1" =~ ^--host=     ]] && HOST="host=$(     echo "$1" | sed 's/--host=//' )"
   shift
 done
 
 set -e
 
 # import demo data into GeoDB
-ogr2ogr -f PostgreSQL PG:"dbname=$DBNAME user=$USERNAME password=$PASSWORD" -lco SCHEMA=qwc_geodb -lco GEOMETRY_NAME=wkb_geometry /tmp/demo_geodata.gpkg
+ogr2ogr -f PostgreSQL PG:"dbname=$DBNAME user=$USERNAME password=$PASSWORD $HOST" -lco SCHEMA=qwc_geodb -lco GEOMETRY_NAME=wkb_geometry /tmp/demo_geodata.gpkg
 
 # create view for fulltext search
 psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
