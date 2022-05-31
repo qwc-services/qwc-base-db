@@ -1,4 +1,14 @@
 #!/bin/bash
+
+help() {
+   echo 'usage: setup-demo-data.sh'
+   echo '       setup-demo-data.sh --help'
+   echo
+   exit 1
+}
+
+[ "$1" == "--help" ] && help
+
 set -e
 
 # import demo data into GeoDB
