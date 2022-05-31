@@ -1,21 +1,32 @@
 #!/bin/bash
 
 help() {
-   echo 'usage: setup-demo-data.sh'
+   echo 'usage: setup-demo-data.sh [--username=USERNAME] [--password=PASSWORD] [--dbname=DBNAME]'
    echo '       setup-demo-data.sh --help'
    echo
    exit 1
 }
 
-[ "$1" == "--help" ] && help
+# defaults
+DBNAME=qwc_demo
+USERNAME=qwc_admin
+PASSWORD=qwc_admin
+
+# parse option parameters
+while [ "$1" != "" ]; do
+  [  "$1" == "--help"      ] && help
+  [[ "$1" =~ ^--dbname=   ]] && DBNAME=$(   echo "$1" | sed 's/--dbname=//'   )
+  [[ "$1" =~ ^--username= ]] && USERNAME=$( echo "$1" | sed 's/--username=//' )
+  [[ "$1" =~ ^--password= ]] && PASSWORD=$( echo "$1" | sed 's/--password=//' )
+done
 
 set -e
 
 # import demo data into GeoDB
-ogr2ogr -f PostgreSQL PG:"dbname=qwc_demo user=qwc_admin password=qwc_admin" -lco SCHEMA=qwc_geodb -lco GEOMETRY_NAME=wkb_geometry /tmp/demo_geodata.gpkg
+ogr2ogr -f PostgreSQL PG:"dbname=$DBNAME user=$USERNAME password=$PASSWORD" -lco SCHEMA=qwc_geodb -lco GEOMETRY_NAME=wkb_geometry /tmp/demo_geodata.gpkg
 
 # create view for fulltext search
-psql -v ON_ERROR_STOP=1 --username qwc_admin -d qwc_demo <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
 CREATE OR REPLACE VIEW qwc_geodb.search_v AS
     SELECT
         'ne_10m_admin_0_countries'::text AS subclass,
@@ -32,7 +43,7 @@ CREATE OR REPLACE VIEW qwc_geodb.search_v AS
 EOSQL
 
 # create demo tables and features for editing
-psql -v ON_ERROR_STOP=1 --username qwc_admin -d qwc_demo <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
     CREATE TABLE qwc_geodb.edit_points
     (
       id serial,
@@ -103,7 +114,7 @@ psql -v ON_ERROR_STOP=1 --username qwc_admin -d qwc_demo <<-EOSQL
         ST_GeomFromText('POLYGON((950819 6003952,950831 6003947,950828 6003925,950822 6003905,950804 6003913,950819 6003952))', 3857));
 EOSQL
 
-psql -v ON_ERROR_STOP=1 --username qwc_admin -d qwc_demo <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
   GRANT SELECT ON ALL TABLES IN SCHEMA qwc_geodb TO qgis_server;
   GRANT SELECT ON ALL SEQUENCES IN SCHEMA qwc_geodb TO qgis_server;
   GRANT SELECT ON ALL TABLES IN SCHEMA qwc_geodb TO qwc_service;
@@ -115,7 +126,7 @@ EOSQL
 # insert demo records into ConfigDB
 # >>> from werkzeug.security import generate_password_hash
 # >>> print(generate_password_hash('demo'))
-psql -v ON_ERROR_STOP=1 --username qwc_admin -d qwc_demo <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
   -- demo role and user (password: 'demo')
   INSERT INTO qwc_config.roles (name, description)
     VALUES ('demo', 'Demo role');
@@ -146,7 +157,7 @@ psql -v ON_ERROR_STOP=1 --username qwc_admin -d qwc_demo <<-EOSQL
 EOSQL
 
 # add demo user info columns
-psql -v ON_ERROR_STOP=1 --username qwc_admin -d qwc_demo <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
   ALTER TABLE qwc_config.user_infos
     ADD COLUMN surname character varying NOT NULL;
   ALTER TABLE qwc_config.user_infos
@@ -159,6 +170,6 @@ psql -v ON_ERROR_STOP=1 --username qwc_admin -d qwc_demo <<-EOSQL
     ADD COLUMN city character varying;
 EOSQL
 
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" -d qwc_demo <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" -d $DBNAME <<-EOSQL
   VACUUM FULL;
 EOSQL
