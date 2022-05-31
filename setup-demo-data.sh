@@ -18,6 +18,7 @@ while [ "$1" != "" ]; do
   [[ "$1" =~ ^--dbname=   ]] && DBNAME=$(   echo "$1" | sed 's/--dbname=//'   )
   [[ "$1" =~ ^--username= ]] && USERNAME=$( echo "$1" | sed 's/--username=//' )
   [[ "$1" =~ ^--password= ]] && PASSWORD=$( echo "$1" | sed 's/--password=//' )
+  shift
 done
 
 set -e
