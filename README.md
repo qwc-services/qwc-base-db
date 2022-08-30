@@ -16,6 +16,8 @@ referenced by the `$PGDATA` ENV variable is empty. If that's
 the case then it will proceed with setting up the
 `qwc_configdb` DB and adding demo data to the `qwc_demo` DB.
 
+The default value for `$PGDATA` ENV is `/var/lib/postgresql/docker`.
+
 The https://github.com/qwc-services/qwc-demo-db repository
 uses this image to create another container image with a
 ready to use database filled with demo data for easy trying
