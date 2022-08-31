@@ -2,6 +2,7 @@
 
 help() {
    echo 'usage: setup-demo-data.sh [--host=HOST]'
+   echo '                          [--port=PORT]'
    echo '                          [--username=USERNAME]'
    echo '                          [--password=PASSWORD]'
    echo '                          [--grants-are-setup-externally]'
@@ -12,30 +13,32 @@ help() {
 }
 
 # defaults
-DBNAME=qwc_demo
-USERNAME=qwc_admin
-PASSWORD=qwc_admin
-HOST=
+export PGDATABASE=qwc_demo
+export USERNAME=qwc_admin
+export PGPASSWORD=qwc_admin
+export PGHOST=localhost
+export PGPORT=5432
 GRANTS_ARE_SETUP_EXTERNALLY=no
 
 # parse option parameters
 while [ "$1" != "" ]; do
   [  "$1" == "--help"      ] && help
-  [[ "$1" =~ ^--dbname=   ]] && DBNAME=$(   echo "$1" | sed 's/--dbname=//'   )
-  [[ "$1" =~ ^--username= ]] && USERNAME=$( echo "$1" | sed 's/--username=//' )
-  [[ "$1" =~ ^--password= ]] && PASSWORD=$( echo "$1" | sed 's/--password=//' )
-  [[ "$1" =~ ^--host=     ]] && HOST="host=$(     echo "$1" | sed 's/--host=//' )"
+  [[ "$1" =~ ^--dbname=   ]] && export PGDATABASE=$(   echo "$1" | sed 's/--dbname=//'   )
+  [[ "$1" =~ ^--username= ]] && export PGUSER=$( echo "$1" | sed 's/--username=//' )
+  [[ "$1" =~ ^--password= ]] && export PGPASSWORD=$( echo "$1" | sed 's/--password=//' )
+  [[ "$1" =~ ^--host=     ]] && export PGHOST=$(     echo "$1" | sed 's/--host=//' )
+  [[ "$1" =~ ^--port=     ]] && export PGPORT=$(     echo "$1" | sed 's/--port=//' )
   [[ "$1" =~ ^--grants-are-setup-externally ]] && GRANTS_ARE_SETUP_EXTERNALLY=yes
   shift
 done
 
-set -e
+set -ex
 
 # import demo data into GeoDB
-ogr2ogr -f PostgreSQL PG:"dbname=$DBNAME user=$USERNAME password=$PASSWORD $HOST" -lco SCHEMA=qwc_geodb -lco GEOMETRY_NAME=wkb_geometry /tmp/demo_geodata.gpkg
+ogr2ogr -f PostgreSQL PG:"dbname=$PGDATABASE user=$PGUSER password=$PGPASSWORD host=$PGHOST port=$PGPORT" -lco SCHEMA=qwc_geodb -lco GEOMETRY_NAME=wkb_geometry /tmp/demo_geodata.gpkg
 
 # create view for fulltext search
-psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
+psql -v ON_ERROR_STOP=1 <<-EOSQL
 CREATE OR REPLACE VIEW qwc_geodb.search_v AS
     SELECT
         'ne_10m_admin_0_countries'::text AS subclass,
@@ -52,7 +55,7 @@ CREATE OR REPLACE VIEW qwc_geodb.search_v AS
 EOSQL
 
 # create demo tables and features for editing
-psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
+psql -v ON_ERROR_STOP=1 <<-EOSQL
     CREATE TABLE qwc_geodb.edit_points
     (
       id serial,
@@ -124,7 +127,7 @@ psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
 EOSQL
 
 if [ "$GRANTS_ARE_SETUP_EXTERNALLY" == "no" ]; then
-  psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
+  psql -v ON_ERROR_STOP=1 <<-EOSQL
     GRANT SELECT ON ALL TABLES IN SCHEMA qwc_geodb TO qgis_server;
     GRANT SELECT ON ALL SEQUENCES IN SCHEMA qwc_geodb TO qgis_server;
     GRANT SELECT ON ALL TABLES IN SCHEMA qwc_geodb TO qwc_service;
@@ -137,7 +140,7 @@ fi
 # insert demo records into ConfigDB
 # >>> from werkzeug.security import generate_password_hash
 # >>> print(generate_password_hash('demo'))
-psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
+psql -v ON_ERROR_STOP=1 <<-EOSQL
   -- demo role and user (password: 'demo')
   INSERT INTO qwc_config.roles (name, description)
     VALUES ('demo', 'Demo role');
@@ -168,7 +171,7 @@ psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
 EOSQL
 
 # add demo user info columns
-psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
+psql -v ON_ERROR_STOP=1 <<-EOSQL
   ALTER TABLE qwc_config.user_infos
     ADD COLUMN surname character varying NOT NULL;
   ALTER TABLE qwc_config.user_infos
@@ -181,6 +184,6 @@ psql -v ON_ERROR_STOP=1 --username $USERNAME -d $DBNAME <<-EOSQL
     ADD COLUMN city character varying;
 EOSQL
 
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" -d $DBNAME <<-EOSQL
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
   VACUUM FULL;
 EOSQL
