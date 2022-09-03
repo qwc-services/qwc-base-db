@@ -44,22 +44,13 @@ RUN \
 #RUN localedef -i de_CH -c -f UTF-8 -A /usr/share/locale/locale.alias de_CH.UTF-8
 #ENV LANG de_CH.utf8
 
-# copy demo connection service for migrations
-COPY pg_service_demo-data.conf /tmp/.pg_service.conf
 
 # setup database
-#
-# add demo data to container
-RUN curl -o /tmp/demo_geodata.gpkg -L https://github.com/pka/mvt-benchmark/raw/master/data/mvtbench.gpkg
-
-# create DB, roles, grants etc
+# script to create DB, roles, grants etc
 COPY setup-roles-and-db.sh /docker-entrypoint-initdb.d/0_setup-db.sh
 
 # script to create tables
 COPY run-migrations.sh /docker-entrypoint-initdb.d/1_run-migrations.sh
-
-# script to insert demo data into DB
-COPY setup-demo-data.sh /docker-entrypoint-initdb.d/2_setup-demo-data.sh
 
 RUN chmod +x /docker-entrypoint-initdb.d/*.sh
 RUN cp -a /usr/local/bin/docker-entrypoint.sh /tmp/docker-entrypoint.sh
