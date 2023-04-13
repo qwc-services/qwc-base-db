@@ -50,7 +50,7 @@ done
 if [ "$USE_PGSERVICE" == "yes" ]; then
   [ "$PGSERVICE_DEMO_DB"   == "" ] && echo "please set --pgservice_demo_db"   >&2 && exit 2
   [ "$PGSERVICE_CONFIG_DB" == "" ] && echo "please set --pgservice_config_db" >&2 && exit 2
-  
+
   export -n PGDATABASE
   export -n PGUSER
   export -n PGPASSWORD
@@ -64,7 +64,8 @@ set -ex
 if [ "$USE_PGSERVICE" == "yes" ]; then
 
   OGR_PG_CONNECTION="service=$PGSERVICE_DEMO_DB"
-  export PGDATABASE=
+  PGSERVICE_DEMO_DB="service=$PGSERVICE_DEMO_DB"
+  PGSERVICE_CONFIG_DB="service=$PGSERVICE_CONFIG_DB"
 else # "$USE_PGSERVICE" == "no"
 
   OGR_PG_CONNECTION="dbname=$PGDATABASE user=$PGUSER password=$PGPASSWORD host=$PGHOST port=$PGPORT"
