@@ -64,13 +64,14 @@ set -ex
 if [ "$USE_PGSERVICE" == "yes" ]; then
 
   OGR_PG_CONNECTION="service=$PGSERVICE_DEMO_DB"
-  PGSERVICE_DEMO_DB="service=$PGSERVICE_DEMO_DB"
-  PGSERVICE_CONFIG_DB="service=$PGSERVICE_CONFIG_DB"
+  DEMO_DB_CONNECTION="service=$PGSERVICE_DEMO_DB"
+  CONFIG_DB_CONNECTION="service=$PGSERVICE_CONFIG_DB"
 else # "$USE_PGSERVICE" == "no"
 
   OGR_PG_CONNECTION="dbname=$PGDATABASE user=$PGUSER password=$PGPASSWORD host=$PGHOST port=$PGPORT"
-  PGSERVICE_DEMO_DB=$PGDATABASE
-  PGSERVICE_CONFIG_DB=$PGDATABASE
+  # Use credentials from ENV variables
+  DEMO_DB_CONNECTION="$PGDATABASE"
+  CONFIG_DB_CONNECTION="$PGDATABASE"
 fi
 
 ogr2ogr -f PostgreSQL PG:"$OGR_PG_CONNECTION" \
@@ -80,7 +81,7 @@ ogr2ogr -f PostgreSQL PG:"$OGR_PG_CONNECTION" \
         /tmp/demo_geodata.gpkg
 
 # create view for fulltext search
-psql -v ON_ERROR_STOP=1 $PGSERVICE_DEMO_DB <<-EOSQL
+psql -v ON_ERROR_STOP=1 $DEMO_DB_CONNECTION <<-EOSQL
 CREATE OR REPLACE VIEW qwc_geodb.search_v AS
     SELECT
         'ne_10m_admin_0_countries'::text AS subclass,
@@ -97,7 +98,7 @@ CREATE OR REPLACE VIEW qwc_geodb.search_v AS
 EOSQL
 
 # create demo tables and features for editing
-psql -v ON_ERROR_STOP=1 $PGSERVICE_DEMO_DB <<-EOSQL
+psql -v ON_ERROR_STOP=1 $DEMO_DB_CONNECTION <<-EOSQL
     CREATE TABLE qwc_geodb.edit_points
     (
       id serial,
@@ -169,7 +170,7 @@ psql -v ON_ERROR_STOP=1 $PGSERVICE_DEMO_DB <<-EOSQL
 EOSQL
 
 if [ "$GRANTS_ARE_SETUP_EXTERNALLY" == "no" ]; then
-  psql -v ON_ERROR_STOP=1 <<-EOSQL
+  psql -v ON_ERROR_STOP=1 $DEMO_DB_CONNECTION <<-EOSQL
     GRANT SELECT ON ALL TABLES IN SCHEMA qwc_geodb TO qgis_server;
     GRANT SELECT ON ALL SEQUENCES IN SCHEMA qwc_geodb TO qgis_server;
     GRANT SELECT ON ALL TABLES IN SCHEMA qwc_geodb TO qwc_service;
@@ -182,7 +183,7 @@ fi
 # insert demo records into ConfigDB
 # >>> from werkzeug.security import generate_password_hash
 # >>> print(generate_password_hash('demo'))
-psql -v ON_ERROR_STOP=1 $PGSERVICE_CONFIG_DB <<-EOSQL
+psql -v ON_ERROR_STOP=1 $CONFIG_DB_CONNECTION <<-EOSQL
   -- demo role and user (password: 'demo')
   INSERT INTO qwc_config.roles (name, description)
     VALUES ('demo', 'Demo role');
@@ -214,7 +215,7 @@ EOSQL
 
 
 # add demo user info columns
-psql -v ON_ERROR_STOP=1 $PGSERVICE_CONFIG_DB <<-EOSQL
+psql -v ON_ERROR_STOP=1 $CONFIG_DB_CONNECTION <<-EOSQL
   ALTER TABLE qwc_config.user_infos
     ADD COLUMN surname character varying NOT NULL;
   ALTER TABLE qwc_config.user_infos
@@ -227,6 +228,6 @@ psql -v ON_ERROR_STOP=1 $PGSERVICE_CONFIG_DB <<-EOSQL
     ADD COLUMN city character varying;
 EOSQL
 
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
+psql -v ON_ERROR_STOP=1 $DEMO_DB_CONNECTION --username "$POSTGRES_USER" <<-EOSQL
   VACUUM FULL;
 EOSQL
