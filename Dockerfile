@@ -28,6 +28,9 @@ ARG GIT_REPO=https://github.com/qwc-services/qwc-config-db.git
 
 ENV PGSERVICEFILE=/tmp/.pg_service.conf
 
+# copy connection service for migrations
+COPY pg_service_base.conf /tmp/.pg_service.conf
+
 COPY install-postgis.sh install-alembic-and-clone-qwc-config-db.sh /usr/local/bin/
 RUN  cd /usr/local/bin && \
      chmod +x install-postgis.sh install-alembic-and-clone-qwc-config-db.sh
