@@ -1,0 +1,14 @@
+# Helper image to run qwc-config-db migrations
+FROM alpine:3.18
+
+ENV PGSERVICEFILE=/tmp/pg_service.conf
+ENV ALEMBIC_VERSION=head
+
+RUN apk add --no-cache --update py3-alembic py3-psycopg2
+
+COPY pg_service.conf /tmp/pg_service.conf
+COPY alembic.ini /tmp/alembic.ini
+COPY alembic /tmp/alembic
+
+WORKDIR /tmp
+ENTRYPOINT ["/bin/sh", "-c", "PGSERVICE=qwc_configdb alembic upgrade ${ALEMBIC_VERSION}"]
