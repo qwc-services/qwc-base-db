@@ -1,5 +1,5 @@
 [![CI](https://github.com/qwc-services/qwc-base-db/actions/workflows/qwc-base-db.yml/badge.svg)](https://github.com/qwc-services/qwc-base-db/actions)
-[![docker](https://img.shields.io/docker/v/sourcepole/qwc-base-db?label=qwc-base-db%20image&sort=semver)](https://hub.docker.com/r/sourcepole/qwc-base-db)
+[![docker](https://img.shields.io/docker/v/sourcepole/qwc-base-db-migrate?label=qwc-base-db-migrate%20image&sort=semver)](https://hub.docker.com/r/sourcepole/qwc-base-db)
 
 QWC Base DB
 ===========
