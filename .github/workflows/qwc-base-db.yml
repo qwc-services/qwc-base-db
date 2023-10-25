@@ -20,14 +20,35 @@ jobs:
             echo "tag=latest,${GITHUB_REF:10}" >>$GITHUB_OUTPUT
           fi
 
-      - name: Build and publish qwc-base-db docker image
+      - name: Build and publish qwc-base-db docker image for pg 13
         uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: sourcepole/qwc-base-db
           username: ${{ secrets.DOCKER_HUB_USER }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          tags: "${{ steps.get_tag.outputs.tag }}"
+          tags: "13"
           workdir: .
+          buildargs: PG_MAJOR=13,POSTGIS_VERSION=3
+
+      - name: Build and publish qwc-base-db docker image for pg 14
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          name: sourcepole/qwc-base-db
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          tags: "14"
+          workdir: .
+          buildargs: PG_MAJOR=14,POSTGIS_VERSION=3
+
+      - name: Build and publish qwc-base-db docker image for pg 15
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          name: sourcepole/qwc-base-db
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          tags: "15"
+          workdir: .
+          buildargs: PG_MAJOR=15,POSTGIS_VERSION=3
 
       - name: Build and publish qwc-base-db-migrate docker image
         uses: elgohr/Publish-Docker-Github-Action@v5

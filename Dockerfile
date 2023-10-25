@@ -1,12 +1,12 @@
 # A postgres DB with the minimal QWC config DB setup
 
-FROM postgres:15
+ARG PG_MAJOR=15
+FROM postgres:${PG_MAJOR}
 
+ARG POSTGIS_VERSION=3
 ENV PGDATA=/var/lib/postgresql/docker
 ENV POSTGRES_PASSWORD=
 
-ARG PG_MAJOR=15
-ARG POSTGIS_VERSION=3
 
 # Install postgis
 RUN \
