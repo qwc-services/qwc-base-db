@@ -13,7 +13,7 @@ These images are designed to be configured in a `docker-compose.yml` as follows 
 
 ```yml
   qwc-postgis:
-    image: sourcepole/qwc-base-db:<version>
+    image: sourcepole/qwc-base-db:<pg_version>
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -33,6 +33,8 @@ Note:
 
 * **You need to set a non-empty `POSTGRES_PASSWORD` ENV variable**.
 * For persistent storage, mount folder volume to `/var/lib/postgresql/docker`.
+* The `sourcepole/qwc-base-db` images are versioned according to the Postgres major version (i.e. 13, 14, 15, ...).
+* The `sourcepole/qwc-base-db-migrate` images are versioned by date (`vYYYY.MM.DD`)
 
 When the `qwc-postgis` image is run, then it checks whether `/var/lib/postgresql/docker` is empty.
 If that's the case then it will proceed with setting up the
