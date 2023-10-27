@@ -1,7 +1,7 @@
 """add expires column to permalinks table
 
 Revision ID: 0307976d3d52
-Revises: d397557cf130
+Revises: 85d1c50359ad
 Create Date: 2023-10-26 19:18:52.896721
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '0307976d3d52'
-down_revision = 'd397557cf130'
+down_revision = '85d1c50359ad'
 branch_labels = None
 depends_on = None
 
