@@ -1,0 +1,26 @@
+version: '3.4'
+
+
+services:
+  
+  qwc-postgis:
+    image: sourcepole/qwc-base-db:15 # 15 refers to the Postgres major version
+    environment:
+      POSTGRES_PASSWORD: 'uefah5WateiWai1e' # TODO: Set your postgres password here!
+    volumes:
+     - ./volumes/db:/var/lib/postgresql/docker
+     # If you don't want/need the demo data, you can remove this line
+     - ./volumes/demo-data/setup-demo-data.sh:/docker-entrypoint-initdb.d/2_setup-demo-data.sh
+    ports:
+     - "127.0.0.1:5439:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+
+  qwc-config-db-migrate:
+    build:
+      context: ..
+      dockerfile: Dockerfile.migrate
+    depends_on:
+      qwc-postgis:
+        condition: service_healthy
