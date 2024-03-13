@@ -2,10 +2,10 @@
 set -e
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<-EOSQL
-  CREATE ROLE qgis_server LOGIN PASSWORD 'qgis_server';
-  CREATE ROLE qwc_admin LOGIN PASSWORD 'qwc_admin';
-  CREATE ROLE qwc_service LOGIN PASSWORD 'qwc_service';
-  CREATE ROLE qwc_service_write LOGIN PASSWORD 'qwc_service_write';
+  CREATE ROLE qgis_server LOGIN PASSWORD '$QGIS_SERVER_PASSWORD';
+  CREATE ROLE qwc_admin LOGIN PASSWORD '$QWC_ADMIN_PASSWORD';
+  CREATE ROLE qwc_service LOGIN PASSWORD '$QWC_SERVICE_PASSWORD';
+  CREATE ROLE qwc_service_write LOGIN PASSWORD '$QWC_SERVICE_WRITE_PASSWORD';
 
   CREATE DATABASE qwc_services;
   COMMENT ON DATABASE qwc_services IS 'DB for qwc-services';
