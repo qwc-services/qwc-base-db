@@ -32,6 +32,7 @@ These images are designed to be configured in a `docker-compose.yml` as follows 
 Note:
 
 * **You need to set a non-empty `POSTGRES_PASSWORD` ENV variable**.
+* You can set passwords for roles in `qwc_services` database with ENV variables: `QGIS_SERVER_PASSWORD`, `QWC_ADMIN_PASSWORD`, `QWC_SERVICE_PASSWORD`, `QWC_SERVICE_WRITE_PASSWORD`. These variables have default values (`qgis_server`, `qwc_admin`, `qwc_service`, `qwc_service_write`).
 * For persistent storage, mount folder volume to `/var/lib/postgresql/docker`.
 * The `sourcepole/qwc-base-db` images are versioned according to the Postgres major version (i.e. 13, 14, 15, ...).
 * The `sourcepole/qwc-base-db-migrate` images are versioned by date (`vYYYY.MM.DD`)
@@ -46,6 +47,15 @@ The `qwc-config-db-migrate` image will run `qwc-postgis` is up, and will apply a
 
 To keep the Config DB up to date, it is sufficient to update the `qwc-base-db-migrate` image version to the latest available version.
 
+Configure the `qwc-config-db-migrate` image mounting the `pg_service.conf` containing the connection information to your database:
+
+```yml
+  qwc-config-db-migrate:
+    image: sourcepole/qwc-base-db-migrate:<version>
+  volumes:
+    ./pg_service.conf:/tmp/pg_service.conf:ro
+```
+
 Migrations will be applied automatically, if necessary, whenever the Docker application is started.
 
 To upgrade to a migration different than `head`, set the `ALEMBIC_VERSION` ENV variable.
@@ -54,7 +64,7 @@ To upgrade to a migration different than `head`, set the `ALEMBIC_VERSION` ENV v
 
 You can use an external DB instead of the `qwc-base-db` dockerized DB.
 
-To set up the external DB, run the SQL commands in `setup-roles-and-db.sh` on your external DB.
+To set up the external DB, set passwords for roles with ENV variables (`QGIS_SERVER_PASSWORD`, `QWC_ADMIN_PASSWORD`, `QWC_SERVICE_PASSWORD`, `QWC_SERVICE_WRITE_PASSWORD`) and run the SQL commands in `setup-roles-and-db.sh` on your external DB.
 
 To apply the migrations, both as part as the initial setup and subsequently to keep the Config DB up-to-date:
 
