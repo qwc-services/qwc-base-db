@@ -20,13 +20,12 @@ These images are designed to be configured in a `docker-compose.yml` as follows 
     environment:
       POSTGRES_PASSWORD: '' # TODO: Set your postgres password here!
     volumes:
-     - ./volumes/db:/var/lib/postgresql/docker
+      - ./volumes/db:/var/lib/postgresql/docker
 
   qwc-config-db-migrate:
     image: sourcepole/qwc-base-db-migrate:<version>
-    depends_on:
-      qwc-postgis:
-        condition: service_healthy
+    volumes:
+      - ./pg_service.conf:/tmp/pg_service.conf:ro
 ```
 
 Note:
@@ -52,8 +51,8 @@ Configure the `qwc-config-db-migrate` image mounting the `pg_service.conf` conta
 ```yml
   qwc-config-db-migrate:
     image: sourcepole/qwc-base-db-migrate:<version>
-  volumes:
-    ./pg_service.conf:/tmp/pg_service.conf:ro
+    volumes:
+      - ./pg_service.conf:/tmp/pg_service.conf:ro
 ```
 
 Migrations will be applied automatically, if necessary, whenever the Docker application is started.
@@ -74,8 +73,8 @@ To apply the migrations, both as part as the initial setup and subsequently to k
 ```yml
   qwc-config-db-migrate:
     image: sourcepole/qwc-base-db-migrate:<version>
-  volumes:
-    ./pg_service.conf:/tmp/pg_service.conf:ro
+    volumes:
+      - ./pg_service.conf:/tmp/pg_service.conf:ro
 ```
 
 # DB Schema overview
