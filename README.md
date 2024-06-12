@@ -59,6 +59,8 @@ Migrations will be applied automatically, if necessary, whenever the Docker appl
 
 To upgrade to a migration different than `head`, set the `ALEMBIC_VERSION` ENV variable.
 
+By default, the DB specified by the `qwc_configdb` connection will be upgraded. You can specify a different connection by setting the `PGSERVICE` ENV variable.
+
 # Managing an external Config DB
 
 You can use an external DB instead of the `qwc-base-db` dockerized DB.

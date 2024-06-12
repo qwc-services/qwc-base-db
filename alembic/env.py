@@ -2,10 +2,15 @@ from __future__ import with_statement
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 from logging.config import fileConfig
+import os
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+# Set variables for config
+section = config.config_ini_section
+config.set_section_option(section, "PGSERVICE", os.environ.get("PGSERVICE"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

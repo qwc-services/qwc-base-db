@@ -2,6 +2,7 @@
 FROM alpine:3.18
 
 ENV PGSERVICEFILE=/tmp/pg_service.conf
+ENV PGSERVICE=qwc_configdb
 ENV ALEMBIC_VERSION=head
 
 RUN apk add --no-cache --update postgresql-client py3-alembic py3-psycopg2

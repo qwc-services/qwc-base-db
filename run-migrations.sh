@@ -5,4 +5,4 @@ until psql service=qwc_configdb -c "select 1" > /dev/null 2>&1; do
   sleep 1
 done
 
-PGSERVICE=qwc_configdb alembic upgrade ${ALEMBIC_VERSION}
+alembic upgrade ${ALEMBIC_VERSION}
