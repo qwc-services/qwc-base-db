@@ -5,9 +5,11 @@ Revises: 4ff55a84dd72
 Create Date: 2019-02-01 13:46:48.426617
 
 """
+import os
 from alembic import op
 import sqlalchemy as sa
 
+qwc_config_schema = os.getenv("QWC_CONFIG_SCHEMA", "qwc_config")
 
 # revision identifiers, used by Alembic.
 revision = '90b3b4fbc8f6'
@@ -18,9 +20,9 @@ depends_on = None
 
 def upgrade():
     sql = sa.sql.text("""
-        ALTER TABLE qwc_config.users
+        ALTER TABLE {schema}.users
           ADD COLUMN totp_secret character varying(16);
-    """)
+    """.format(schema=qwc_config_schema))
 
     conn = op.get_bind()
     conn.execute(sql)
@@ -28,9 +30,9 @@ def upgrade():
 
 def downgrade():
     sql = sa.sql.text("""
-        ALTER TABLE qwc_config.users
+        ALTER TABLE {schema}.users
           DROP COLUMN totp_secret;
-    """)
+    """.format(schema=qwc_config_schema))
 
     conn = op.get_bind()
     conn.execute(sql)

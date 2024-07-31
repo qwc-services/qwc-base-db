@@ -5,9 +5,11 @@ Revises: b21139053154
 Create Date: 2018-07-03 13:11:00.253559
 
 """
+import os
 from alembic import op
 import sqlalchemy as sa
 
+qwc_config_schema = os.getenv("QWC_CONFIG_SCHEMA", "qwc_config")
 
 # revision identifiers, used by Alembic.
 revision = 'f805e8e4a791'
@@ -18,9 +20,9 @@ depends_on = None
 
 def upgrade():
     sql = sa.sql.text("""
-        INSERT INTO qwc_config.roles (name, description)
+        INSERT INTO {schema}.roles (name, description)
           VALUES ('public', 'Public role');
-    """)
+    """.format(schema=qwc_config_schema))
 
     conn = op.get_bind()
     conn.execute(sql)
@@ -28,8 +30,8 @@ def upgrade():
 
 def downgrade():
     sql = sa.sql.text("""
-        DELETE FROM qwc_config.roles WHERE name = 'public';
-    """)
+        DELETE FROM {schema}.roles WHERE name = 'public';
+    """.format(schema=qwc_config_schema))
 
     conn = op.get_bind()
     conn.execute(sql)

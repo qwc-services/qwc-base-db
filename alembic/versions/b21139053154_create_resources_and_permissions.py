@@ -5,9 +5,11 @@ Revises: 9c671585cfb1
 Create Date: 2018-07-03 13:09:23.087429
 
 """
+import os
 from alembic import op
 import sqlalchemy as sa
 
+qwc_config_schema = os.getenv("QWC_CONFIG_SCHEMA", "qwc_config")
 
 # revision identifiers, used by Alembic.
 revision = 'b21139053154'
@@ -18,21 +20,21 @@ depends_on = None
 
 def upgrade():
     sql = sa.sql.text("""
-        CREATE TYPE qwc_config.resource_type AS
+        CREATE TYPE {schema}.resource_type AS
           ENUM ('map', 'layer', 'attribute');
 
-        CREATE TABLE qwc_config.resources (
+        CREATE TABLE {schema}.resources (
           id serial NOT NULL,
           parent_id integer,
-          type qwc_config.resource_type NOT NULL,
+          type {schema}.resource_type NOT NULL,
           name character varying NOT NULL,
           CONSTRAINT resources_pk PRIMARY KEY (id),
           CONSTRAINT parent_fk FOREIGN KEY (parent_id)
-              REFERENCES qwc_config.resources (id) MATCH FULL
+              REFERENCES {schema}.resources (id) MATCH FULL
               ON UPDATE CASCADE ON DELETE RESTRICT
         );
 
-        CREATE TABLE qwc_config.permissions (
+        CREATE TABLE {schema}.permissions (
           id serial NOT NULL,
           role_id integer NOT NULL,
           resource_id integer NOT NULL,
@@ -40,13 +42,13 @@ def upgrade():
           write boolean NOT NULL DEFAULT FALSE,
           CONSTRAINT permissions_pk PRIMARY KEY (id),
           CONSTRAINT role_fk FOREIGN KEY (role_id)
-              REFERENCES qwc_config.roles (id) MATCH FULL
+              REFERENCES {schema}.roles (id) MATCH FULL
               ON UPDATE CASCADE ON DELETE RESTRICT,
           CONSTRAINT resource_fk FOREIGN KEY (resource_id)
-              REFERENCES qwc_config.resources (id) MATCH FULL
+              REFERENCES {schema}.resources (id) MATCH FULL
               ON UPDATE CASCADE ON DELETE RESTRICT
         );
-    """)
+    """.format(schema=qwc_config_schema))
 
     conn = op.get_bind()
     conn.execute(sql)
@@ -54,10 +56,10 @@ def upgrade():
 
 def downgrade():
     sql = sa.sql.text("""
-        DROP TABLE qwc_config.resources CASCADE;
-        DROP TABLE qwc_config.permissions CASCADE;
-        DROP TYPE qwc_config.resource_type;
-    """)
+        DROP TABLE {schema}.resources CASCADE;
+        DROP TABLE {schema}.permissions CASCADE;
+        DROP TYPE {schema}.resource_type;
+    """.format(schema=qwc_config_schema))
 
     conn = op.get_bind()
     conn.execute(sql)
