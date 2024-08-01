@@ -27,7 +27,7 @@ def upgrade():
           user_id integer NOT NULL,
           CONSTRAINT user_infos_pk PRIMARY KEY (user_id),
           CONSTRAINT user_fk FOREIGN KEY (user_id)
-              REFERENCES qwc_config.users (id) MATCH FULL
+              REFERENCES {schema}.users (id) MATCH FULL
               ON UPDATE CASCADE ON DELETE RESTRICT
         );
     """.format(schema=qwc_config_schema))
