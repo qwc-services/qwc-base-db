@@ -13,8 +13,8 @@ jobs:
       - name: Set up demo database and run migrations
         run: |
           cd ${GITHUB_WORKSPACE}/test
-          docker-compose up -d qwc-postgis
-          docker-compose up --exit-code-from qwc-config-db-migrate
+          docker compose up -d qwc-postgis
+          docker compose up --exit-code-from qwc-config-db-migrate
 
     build:
       needs: test
