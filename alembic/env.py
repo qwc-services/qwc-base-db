@@ -10,7 +10,7 @@ config = context.config
 
 # Set variables for config
 section = config.config_ini_section
-config.set_section_option(section, "PGSERVICE", os.environ.get("PGSERVICE"))
+config.set_section_option(section, "PGSERVICE", os.environ.get("PGSERVICE", "qwc_configdb"))
 config.set_section_option(section, "QWC_CONFIG_SCHEMA", os.environ.get("QWC_CONFIG_SCHEMA", "qwc_config"))
 
 # Interpret the config file for Python logging.
