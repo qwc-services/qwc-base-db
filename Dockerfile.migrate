@@ -1,5 +1,5 @@
 # Helper image to run qwc-config-db migrations
-FROM alpine:3.18
+FROM alpine:3.21
 
 ENV PGSERVICEFILE=/tmp/pg_service.conf
 ENV PGSERVICE=qwc_configdb
