@@ -79,6 +79,10 @@ To apply the migrations, both as part as the initial setup and subsequently to k
       - ./pg_service.conf:/tmp/pg_service.conf:ro
 ```
 
+# Extra initialization
+
+You can mount additional scripts to perform initial DB setup to `/tmp/extra-init.d`. These scripts will only be executed after the initial DB migration (i.e. if `alembic current` was empty).
+
 # DB Schema overview
 
 ![er-diagram](er-diagram.png)
