@@ -71,7 +71,7 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
           tags: "16"
           workdir: .
-          buildargs: PG_MAJOR=15,POSTGIS_VERSION=3
+          buildargs: PG_MAJOR=16,POSTGIS_VERSION=3
 
       - name: Build and publish qwc-base-db-migrate docker image
         uses: elgohr/Publish-Docker-Github-Action@v5
