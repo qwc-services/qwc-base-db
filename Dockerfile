@@ -8,7 +8,6 @@ ENV PGDATA=/var/lib/postgresql/docker
 ENV POSTGRES_PASSWORD=
 
 # ENV for qwc-services database roles passwords
-ENV QGIS_SERVER_PASSWORD=qgis_server
 ENV QWC_ADMIN_PASSWORD=qwc_admin
 ENV QWC_SERVICE_PASSWORD=qwc_service
 ENV QWC_SERVICE_WRITE_PASSWORD=qwc_service_write
