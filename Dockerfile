@@ -4,7 +4,6 @@ ARG PG_MAJOR=15
 FROM postgres:${PG_MAJOR}
 
 ARG POSTGIS_VERSION=3
-ARG PG_SEARCH_VERSION=0.15.25
 ENV PGDATA=/var/lib/postgresql/docker
 ENV POSTGRES_PASSWORD=
 
@@ -21,12 +20,17 @@ RUN \
     rm -rf /var/lib/apt/lists/*
 
 # Install pg_search extension
+ARG PG_SEARCH_VERSION=0.18.8
+# There is no trixie version, so wie install an additional version of libicu
 RUN \
     curl -o pg-search.deb -L https://github.com/paradedb/paradedb/releases/download/v${PG_SEARCH_VERSION}/postgresql-${PG_MAJOR}-pg-search_${PG_SEARCH_VERSION}-1PARADEDB-bookworm_amd64.deb && \
     dpkg -i pg-search.deb && \
     echo "shared_preload_libraries='pg_search'" >> /usr/share/postgresql/postgresql.conf.sample && \
     rm pg-search.deb
-
+RUN \
+    curl -o libicu72.deb -L http://ftp.de.debian.org/debian/pool/main/i/icu/libicu72_72.1-6_amd64.deb && \
+    dpkg -i libicu72.deb && \
+    rm libicu72.deb
 
 # Setup database
 # script to create DB, roles, grants etc
