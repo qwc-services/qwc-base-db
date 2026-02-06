@@ -31,14 +31,13 @@ These images are designed to be configured in a `docker-compose.yml` as follows 
 Note:
 
 * **You need to set a non-empty `POSTGRES_PASSWORD` ENV variable**.
-* You can set passwords for roles in `qwc_services` database with ENV variables: `QGIS_SERVER_PASSWORD`, `QWC_ADMIN_PASSWORD`, `QWC_SERVICE_PASSWORD`, `QWC_SERVICE_WRITE_PASSWORD`. These variables have default values (`qgis_server`, `qwc_admin`, `qwc_service`, `qwc_service_write`).
-* For persistent storage, mount folder volume to `/var/lib/postgresql/docker`.
+* The DB setup script will create the roles `qwc_admin`, `qwc_service`, `qwc_service_write`. By default, the passwords of these roles will be equal to the respective role name. You set custom passwords for the roles by setting the ENV variables `QWC_ADMIN_PASSWORD`, `QWC_SERVICE_PASSWORD`, `QWC_SERVICE_WRITE_PASSWORD`.
+* For persistent storage, mount a folder volume to `/var/lib/postgresql/docker`.
 * The `sourcepole/qwc-base-db` images are versioned according to the Postgres major version (i.e. 13, 14, 15, ...).
 * The `sourcepole/qwc-base-db-migrate` images are versioned by date (`vYYYY.MM.DD`)
 
 When the `qwc-postgis` image is run, then it checks whether `/var/lib/postgresql/docker` is empty.
-If that's the case then it will proceed with setting up the
-`qwc_configdb` DB.
+If that's the case then it will proceed with setting up the `qwc_configdb` DB.
 
 The `qwc-config-db-migrate` image will run `qwc-postgis` is up, and will apply all available migrations to the Config DB.
 
