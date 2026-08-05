@@ -1,6 +1,9 @@
-name: Publish qwc-base-db docker images
+name: Build and publish docker image
 
-on: [push]
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
 
@@ -17,9 +20,9 @@ jobs:
           docker compose up --exit-code-from qwc-config-db-migrate
 
     build:
+      if: github.ref_type == 'tag'
       needs: test
       runs-on: ubuntu-latest
-      if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
       steps:
 
       - uses: actions/checkout@master
