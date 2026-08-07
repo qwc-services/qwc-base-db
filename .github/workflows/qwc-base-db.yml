@@ -19,15 +19,40 @@ jobs:
           docker compose up -d qwc-postgis
           docker compose up --exit-code-from qwc-config-db-migrate
 
-    build:
+    build_qwc_base_db:
       if: github.ref_type == 'tag'
       needs: test
       runs-on: ubuntu-latest
+
+      strategy:
+        matrix:
+          pg_major: [13, 14, 15, 16, 17, 18]
+
       steps:
 
       - uses: actions/checkout@master
 
-      - name: Get version tag
+      - name: Build and publish qwc-base-db docker image for pg ${{ matrix.pg_major }}
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          name: sourcepole/qwc-base-db
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+          tags: "${{ matrix.pg_major }}"
+          workdir: .
+          buildargs: PG_MAJOR=${{ matrix.pg_major }},POSTGIS_VERSION=3
+
+
+    build_qwc_base_db_migrate:
+      if: github.ref_type == 'tag'
+      needs: test
+      runs-on: ubuntu-latest
+
+      steps:
+
+      - uses: actions/checkout@master
+
+      - name: Get db-migrate version tag
         id: get_tag
         run: |
           if [ ${{ endsWith(github.ref, '-lts') }} = true ]; then
@@ -35,66 +60,6 @@ jobs:
           else
             echo "tag=latest,${GITHUB_REF:10}" >>$GITHUB_OUTPUT
           fi
-
-      - name: Build and publish qwc-base-db docker image for pg 13
-        uses: elgohr/Publish-Docker-Github-Action@v5
-        with:
-          name: sourcepole/qwc-base-db
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          tags: "13"
-          workdir: .
-          buildargs: PG_MAJOR=13,POSTGIS_VERSION=3
-
-      - name: Build and publish qwc-base-db docker image for pg 14
-        uses: elgohr/Publish-Docker-Github-Action@v5
-        with:
-          name: sourcepole/qwc-base-db
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          tags: "14"
-          workdir: .
-          buildargs: PG_MAJOR=14,POSTGIS_VERSION=3
-
-      - name: Build and publish qwc-base-db docker image for pg 15
-        uses: elgohr/Publish-Docker-Github-Action@v5
-        with:
-          name: sourcepole/qwc-base-db
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          tags: "15"
-          workdir: .
-          buildargs: PG_MAJOR=15,POSTGIS_VERSION=3
-
-      - name: Build and publish qwc-base-db docker image for pg 16
-        uses: elgohr/Publish-Docker-Github-Action@v5
-        with:
-          name: sourcepole/qwc-base-db
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          tags: "16"
-          workdir: .
-          buildargs: PG_MAJOR=16,POSTGIS_VERSION=3
-
-      - name: Build and publish qwc-base-db docker image for pg 17
-        uses: elgohr/Publish-Docker-Github-Action@v5
-        with:
-          name: sourcepole/qwc-base-db
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          tags: "17"
-          workdir: .
-          buildargs: PG_MAJOR=17,POSTGIS_VERSION=3
-
-      - name: Build and publish qwc-base-db docker image for pg 18
-        uses: elgohr/Publish-Docker-Github-Action@v5
-        with:
-          name: sourcepole/qwc-base-db
-          username: ${{ secrets.DOCKER_HUB_USER }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-          tags: "18"
-          workdir: .
-          buildargs: PG_MAJOR=18,POSTGIS_VERSION=3
 
       - name: Build and publish qwc-base-db-migrate docker image
         uses: elgohr/Publish-Docker-Github-Action@v5
