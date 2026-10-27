@@ -1,7 +1,7 @@
 #!/bin/sh
 
 until psql service=$PGSERVICE -c "select 1" > /dev/null 2>&1; do
-  echo "Waiting for postgres server..."
+  echo "Waiting for postgres server service=$PGSERVICE..."
   sleep 1
 done
 
